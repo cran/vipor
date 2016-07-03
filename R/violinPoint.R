@@ -48,7 +48,9 @@ vpPlot<-function(x=rep('Data',length(y)),y,xaxt='y',offsetXArgs=NULL,...){
   names(labelIds)<-labels
   xPos<-ids+do.call(offsetX,c(list(y),list(x),offsetXArgs))
   graphics::plot(xPos,y,...,xaxt='n',xlab='')
-  if(xaxt!='n')graphics::axis(1,labelIds,labels,...)
+  #avoid point color passing into axis ticks inside ...
+  noColAxis<-function(...,col)graphics::axis(1,labelIds,labels,col='black',...)
+  if(xaxt!='n')noColAxis(...)
   return(invisible(xPos))
 }
 
@@ -92,10 +94,10 @@ offsetX <- function(y, x=rep(1, length(y)), width=0.4, varwidth=FALSE,...) {
   maxLength<-max(table(x))
 
   # Apply the van der Corput noise to each x group to create offsets
-  new_x <- aveWithArgs(y,x, FUN=offsetSingleGroup,maxLength=if(varwidth){maxLength}else{NULL},...)
-  new_x <- new_x*width
+  offsets <- aveWithArgs(y,x, FUN=offsetSingleGroup,maxLength=if(varwidth){maxLength}else{NULL},...)
+  out <- offsets*width
 
-  return(new_x)
+  return(out)
 }
 
 
@@ -106,14 +108,22 @@ offsetX <- function(y, x=rep(1, length(y)), width=0.4, varwidth=FALSE,...) {
 # Arranges data points using quasirandom noise (van der Corput sequence), pseudorandom noise or alternatively positioning extreme values within a band to the left and right to form beeswarm/one-dimensional scatter/strip chart style plots. Returns a vector of the offsets to be used in plotting. This function is mostly used as a subroutine of \code{\link{offsetX}}
 # @param y y values for a single group for which offsets should be calculated
 #' @param maxLength multiply the offset by sqrt(length(y)/maxLength) if not NULL. The sqrt is to match boxplot (allows comparison of order of magnitude different ns, scale with standard error)
-#' @param method method used to distribute the points
+#' @param method method used to distribute the points:
+#' \describe{
+#'   \item{quasirandom:}{points are distributed within a kernel density estimate of the distribution with offset determined by quasirandom Van der Corput noise}
+#'   \item{pseudorandom:}{points are distributed within a kernel density estimate of the distribution with offset determined by pseudorandom noise a la jitter}
+#'   \item{smiley:}{points are distributed within a kernel density with points in a band distributed with highest value points on the  outside and lowest in the middle}
+#'   \item{frowney:}{points are distributed within a kernel density with points in a band distributed with highest value points in the middle and lowest on the outside}
+#'   \item{tukey:}{points are distributed as described in Tukey and Tukey "Strips displaying empirical distributions: I. textured dot strips"}
+#'   \item{tukeyDense:}{points are distributed as described in Tukey and Tukey but are constrained with the kernel density estimate}
+#' }
 #' @param nbins the number of points used to calculate density (defaults to 1000 for quasirandom and pseudorandom and 100 for others)
 #' @param adjust adjust the bandwidth used to calculate the kernel density (smaller values mean tighter fit, larger values looser fit, default is 1)
 #' @export
 #' @rdname offsetX 
 # @seealso \code{\link{offsetX}}, \code{\link[stats]{density}}
 # @return a vector with of x-offsets between -1 and 1 of the same length as y
-offsetSingleGroup<-function(y,maxLength=NULL,method=c('quasirandom','pseudorandom','smiley','frowney'),nbins=NULL,adjust=1) {
+offsetSingleGroup<-function(y,maxLength=NULL,method=c('quasirandom','pseudorandom','smiley','frowney','tukey','tukeyDense'),nbins=NULL,adjust=1) {
   method<-match.arg(method)
   if(is.null(nbins))nbins<-ifelse(method %in% c("pseudorandom","quasirandom"),2^10,ceiling(length(y)/5))
   #catch 0 length inputs
@@ -132,10 +142,13 @@ offsetSingleGroup<-function(y,maxLength=NULL,method=c('quasirandom','pseudorando
     'pseudorandom'=stats::runif(length(y)),
     'smiley'=stats::ave(y,as.character(cut(y,dens$x)),FUN=topBottomDistribute),
     'frowney'=stats::ave(y,as.character(cut(y,dens$x)),FUN=function(x)topBottomDistribute(x,frowney=TRUE)),
+    'tukeyDense'=tukeyTexture(y)/100,
+    'tukey'=tukeyTexture(y,TRUE,TRUE)/100,
     stop(simpleError('Unrecognized method in offsetSingleGroup'))
   )
 
-  pointDensities<-stats::approx(dens$x,dens$y,y)$y
+  if(method %in% c('tukey'))pointDensities<-1
+  else pointDensities<-stats::approx(dens$x,dens$y,y)$y
 
   #*2 to get -1 to 1
   out<-(offset-.5)*2*pointDensities*subgroup_width
