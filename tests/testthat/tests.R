@@ -25,7 +25,13 @@ test_that("Test single group offsetting",{
   for(ii in c('quasirandom','pseudorandom','smiley','frowney','tukey','tukeyDense')){
     expect_lte(max(offsetX(rnorm(100),method=ii,width=.1)),.1)
     expect_gte(min(offsetX(rnorm(100),method=ii,width=.1)),-.1)
-    expect_equal(length(offsetX(rnorm(100),method=ii)),100)
+    expect_equal(length(offsetSingleGroup(rnorm(100),method=ii)),100)
+    expect_equal(length(offsetSingleGroup(rnorm(2),method=ii)),2)
+    expect_equal(length(offsetSingleGroup(rnorm(1),method=ii)),1)
+    #make sure no errors with small groups
+    expect_error(offsetSingleGroup(1,method=ii),NA)
+    expect_error(offsetSingleGroup(1:2,method=ii),NA)
+    expect_error(offsetSingleGroup(1:3,method=ii),NA)
   }
 })
 
@@ -117,6 +123,14 @@ test_that("Test digit combining",{
   expect_error(digits2number(c(1,1,1),0), 'base') #doesn't really require an error but probably does not produce a desired result
   expect_error(digits2number(1,-1), 'base') #doesn't really require an error but probably does not produce a desired result
   expect_error(digits2number(-1,10), 'digit') #doesn't really require an error but probably does not produce a desired result
+  #test fractional. Note never reaches 1
+  expect_equal(digits2number(1,base=2,fractional=TRUE),1/2)
+  expect_equal(digits2number(7,base=8,fractional=TRUE),7/8)
+  expect_equal(digits2number(c(0,1),base=2,fractional=TRUE),2/4)
+  #not really well formed but might as well handle
+  expect_equal(digits2number(20,base=2),20)
+  expect_equal(digits2number(c(1,20),base=2),41)
+  expect_equal(digits2number(20,base=8,fractional=TRUE),20/8)
 })
 
 test_that("Test consistency",{
