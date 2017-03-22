@@ -28,4 +28,3 @@ A dataset containing data from the US census burea
 \url{https://www.census.gov/prod/cen2010/cph-2-1.pdf}
 }
 \keyword{datasets}
-

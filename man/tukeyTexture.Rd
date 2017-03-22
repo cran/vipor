@@ -31,4 +31,3 @@ x<-1:100
 plot(tukeyTexture(x),x)
 plot(tukeyTexture(log10(counties$landArea),TRUE,TRUE),log10(counties$landArea),cex=.25)
 }
-

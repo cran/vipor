@@ -21,10 +21,9 @@ ids<-rep(1:length(dat),sapply(dat,length))
 offset<-offsetX(unlist(dat),ids)
 plot(unlist(dat),ids+offset)
 }
-\author{
-Scott Sherrill-Mix, \email{shescott@upenn.edu}
-}
 \seealso{
 \url{http://github.com/sherrillmix/vipor}
 }
-
+\author{
+Scott Sherrill-Mix, \email{shescott@upenn.edu}
+}
