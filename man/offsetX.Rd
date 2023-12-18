@@ -7,9 +7,14 @@
 \usage{
 offsetX(y, x = rep(1, length(y)), width = 0.4, varwidth = FALSE, ...)
 
-offsetSingleGroup(y, maxLength = NULL, method = c("quasirandom",
-  "pseudorandom", "smiley", "maxout", "frowney", "minout", "tukey",
-  "tukeyDense"), nbins = NULL, adjust = 1)
+offsetSingleGroup(
+  y,
+  maxLength = NULL,
+  method = c("quasirandom", "pseudorandom", "smiley", "maxout", "frowney", "minout",
+    "tukey", "tukeyDense"),
+  nbins = NULL,
+  adjust = 1
+)
 }
 \arguments{
 \item{y}{vector of data points}

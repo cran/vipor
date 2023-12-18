@@ -1,12 +1,10 @@
 # Plot one-dimensional data using quasirandom noise and kernel density
 
-[![Build Status](https://travis-ci.org/sherrillmix/vipor.svg?branch=master)](https://travis-ci.org/sherrillmix/vipor)
-[![codecov.io](https://codecov.io/github/sherrillmix/vipor/coverage.svg?branch=master)](https://codecov.io/github/sherrillmix/vipor?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/vipor)](https://cran.r-project.org/package=vipor)
 
 ## Introduction
 
-`vipor` (VIolin POints in R) provides a way to plot one-dimensional data (perhaps divided into several categories) by spreading the data points to fill the kernel density. It uses a [van der Corput sequence](http://en.wikipedia.org/wiki/Van_der_Corput_sequence) to space the dots and avoid generating distracting patterns in the data. See the examples below.
+`vipor` (VIolin POints in R) provides a way to plot one-dimensional data (perhaps divided into several categories) by spreading the data points to fill the kernel density. It uses a [van der Corput sequence](https://en.wikipedia.org/wiki/Van_der_Corput_sequence) to space the dots and avoid generating distracting patterns in the data. See the examples below.
 
 Violin scatter plots (aka column scatter plots or beeswarm plots or one dimensional scatter plots) are a way of plotting points that would ordinarily overlap so that they fall next to each other instead. In addition to reducing overplotting, it helps visualize the density of the data at each point (similar to a violin plot), while still showing each data point individually.
 
